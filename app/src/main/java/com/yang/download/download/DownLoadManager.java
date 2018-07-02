@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +26,18 @@ import okhttp3.Response;
  */
 
 public class DownLoadManager {
+
+    // 下载状态：正常，暂停，下载中，已下载，排队中，失败
+    public static final int DOWNLOAD_STATE_NORMAL = 0x00;
+    public static final int DOWNLOAD_STATE_PAUSE = 0x01;
+    public static final int DOWNLOAD_STATE_DOWNLOADING = 0x02;
+    public static final int DOWNLOAD_STATE_FINISH = 0x03;
+    public static final int DOWNLOAD_STATE_WAITING = 0x04;
+    public static final int DOWNLOAD_STATE_WAIT = 0x05;
+    public static final int DOWNLOAD_STATE_FAIL = 0x06;
+    public static final int DOWNLOAD_STATE_RESTART = 0x07;
+    public static final int DOWNLOAD_STATE_CANCLE = 0x08;
+
     private static final AtomicReference<DownLoadManager> INSTANCE = new AtomicReference<>();
     private OkHttpClient mClient;//OKHttpClient;
     private Context mContext;
@@ -154,6 +168,9 @@ public class DownLoadManager {
                         @Override
                         public void run() {
                             downloadResponseHandler.onProgress(finalInfo1.getProgress(), finalInfo1.getTotal());
+
+                            finalInfo1.setDownloadState(DOWNLOAD_STATE_DOWNLOADING);
+                            EventBus.getDefault().post(finalInfo1);
                         }
                     });
                     request = new Request.Builder()
@@ -164,6 +181,9 @@ public class DownLoadManager {
                 }else {
                     info = new DownloadInfo(url);
                     info.setTargetUrl(targetUrl);
+
+                    info.setDownloadState(DOWNLOAD_STATE_NORMAL);
+                    EventBus.getDefault().post(info);
                     request = new Request.Builder()
                             .url(url)
                             .tag(url)
@@ -183,7 +203,7 @@ public class DownLoadManager {
                         })
                         .build()
                         .newCall(request);
-                call.enqueue(new MyDownloadCallback(new Handler(Looper.getMainLooper()), downloadResponseHandler, targetUrl));
+                call.enqueue(new MyDownloadCallback(new Handler(Looper.getMainLooper()), downloadResponseHandler, targetUrl,finalInfo));
             }
         }).start();
 
@@ -195,12 +215,14 @@ public class DownLoadManager {
         private Handler mHandler;
         private DownloadResponseHandler mDownloadResponseHandler;
         private String targetUrl;
+        private DownloadInfo info;
 
         public MyDownloadCallback(Handler handler, DownloadResponseHandler downloadResponseHandler,
-                                  String targetUrl) {
+                                  String targetUrl,DownloadInfo info) {
             mHandler = handler;
             mDownloadResponseHandler = downloadResponseHandler;
             this.targetUrl = targetUrl;
+            this.info = info;
         }
 
         @Override
@@ -211,6 +233,8 @@ public class DownLoadManager {
                 @Override
                 public void run() {
                     mDownloadResponseHandler.onFailure(e.toString());
+                    info.setDownloadState(DOWNLOAD_STATE_FAIL);
+                    EventBus.getDefault().post(info);
                 }
             });
         }
@@ -228,6 +252,9 @@ public class DownLoadManager {
                         @Override
                         public void run() {
                             mDownloadResponseHandler.onFailure("onResponse saveFile fail." + e.toString());
+
+                            info.setDownloadState(DOWNLOAD_STATE_FAIL);
+                            EventBus.getDefault().post(info);
                         }
                     });
                 }
@@ -237,6 +264,9 @@ public class DownLoadManager {
                     @Override
                     public void run() {
                         mDownloadResponseHandler.onFinish(newFile);
+
+                        info.setDownloadState(DOWNLOAD_STATE_FINISH);
+                        EventBus.getDefault().post(info);
                     }
                 });
             } else {
@@ -246,6 +276,8 @@ public class DownLoadManager {
                     @Override
                     public void run() {
                         mDownloadResponseHandler.onFailure("fail status=" + response.code());
+                        info.setDownloadState(DOWNLOAD_STATE_FAIL);
+                        EventBus.getDefault().post(info);
                     }
                 });
             }

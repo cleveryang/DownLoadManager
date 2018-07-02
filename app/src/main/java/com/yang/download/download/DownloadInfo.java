@@ -12,6 +12,7 @@ public class DownloadInfo {
     private long total;//总大小
     private long progress;//当前进度
     private String fileName;//名称
+    private int downloadState;//下载状态
 
     public DownloadInfo(String url) {
         this.url = url;
@@ -51,5 +52,13 @@ public class DownloadInfo {
 
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
+    }
+
+    public void setDownloadState(int downloadState) {
+        this.downloadState = downloadState;
+    }
+
+    public int getDownloadState() {
+        return downloadState;
     }
 }

@@ -66,6 +66,7 @@ public class ResponseProgressBody extends ResponseBody {
                     info.setProgress(totalBytesRead+progress);
 //                    mDownloadResponseHandler.onProgress(totalBytesRead+(info!=null?info.getProgress():0), info!=null?info.getProgress()+mResponseBody.contentLength():mResponseBody.contentLength());
                     mDownloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
+                    info.setDownloadState(DownLoadManager.DOWNLOAD_STATE_DOWNLOADING);
                     EventBus.getDefault().post(info);
                 }
                 return bytesRead;

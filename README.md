@@ -40,6 +40,7 @@ Android下载管理器
 
     DownLoadManager.getInstance(this).setMaxRequests(1);
 
+
     
 
    
