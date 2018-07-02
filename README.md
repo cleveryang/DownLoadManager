@@ -39,7 +39,7 @@ Android下载管理器
 设置同时下载请求数（默认为1）
 
     DownLoadManager.getInstance(this).setMaxRequests(1);
+
     
-效果图如下，上面为单个进度，下面文字版为当前所有进度监听：
 
    
