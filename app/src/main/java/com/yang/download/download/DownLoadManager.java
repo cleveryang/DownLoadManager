@@ -169,7 +169,7 @@ public class DownLoadManager {
                         public void run() {
                             downloadResponseHandler.onProgress(finalInfo1.getProgress(), finalInfo1.getTotal());
 
-                            finalInfo1.setDownloadState(DOWNLOAD_STATE_DOWNLOADING);
+                            finalInfo1.setDownloadState(DOWNLOAD_STATE_WAITING);
                             EventBus.getDefault().post(finalInfo1);
                         }
                     });
@@ -182,7 +182,7 @@ public class DownLoadManager {
                     info = new DownloadInfo(url);
                     info.setTargetUrl(targetUrl);
 
-                    info.setDownloadState(DOWNLOAD_STATE_NORMAL);
+                    info.setDownloadState(DOWNLOAD_STATE_WAITING);
                     EventBus.getDefault().post(info);
                     request = new Request.Builder()
                             .url(url)
