@@ -1,5 +1,5 @@
 # DownloadManager
-##Android下载管理器
+## Android下载管理器
 
 1、可实现下载、暂停、取消、完成、失败、队列等待等状态的监听
 
@@ -11,6 +11,7 @@
 
 5、可设置最大同时下载线程数
 
+## 使用方法
 下载方式有三种：
 
     /**
@@ -38,9 +39,10 @@
      */
     DownLoadManager.getInstance(this).download(DownloadInfo downloadInfo, final DownloadResponseHandler downloadResponseHandler)
         
-##监听下载进度
+监听下载进度
 
 单个任务监听
+
     DownloadResponseHandler回调
 
 全局监听(eventbus实现，也可用广播等)
@@ -78,6 +80,8 @@
 得到已完成队列(不校验文件是否存在或完整，如用户手动删除了源文件)
 
     DownloadManager.getInstance(this).getCompleteInfos();
+    
+## 说明介绍
 
 DownloadInfo类
 
