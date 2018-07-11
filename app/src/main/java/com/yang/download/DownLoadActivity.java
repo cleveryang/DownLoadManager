@@ -10,7 +10,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.yang.download.download.DownLoadManager;
+import com.yang.download.download.DownloadManager;
 import com.yang.download.download.DownloadInfo;
 import com.yang.download.download.DownloadResponseHandler;
 
@@ -60,7 +60,7 @@ public class DownLoadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         mUnbinder = ButterKnife.bind(this);
-        DownLoadManager.getInstance(this).setMaxRequests(2);
+        DownloadManager.getInstance(this).setMaxRequests(2);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class DownLoadActivity extends AppCompatActivity {
 
     @OnClick(R.id.main_btn_down1)
     void onDown1() {
-        DownLoadManager.getInstance(this).download(url1, getDiskFileDir(this) + "/app.apk", new DownloadResponseHandler() {
+        DownloadManager.getInstance(this).download(url1, getDiskFileDir(this) + "/app.apk", new DownloadResponseHandler() {
             @Override
             public void onFinish(File download_file) {
 
@@ -99,12 +99,22 @@ public class DownLoadActivity extends AppCompatActivity {
             public void onFailure(String error_msg) {
 
             }
+
+            @Override
+            public void onPause(DownloadInfo info) {
+
+            }
+
+            @Override
+            public void onCancle(DownloadInfo info) {
+
+            }
         });
     }
 
     @OnClick(R.id.main_btn_down2)
     void onDown2() {
-        DownLoadManager.getInstance(this).download(url2, getDiskFileDir(this) + "/toefl.apk", new DownloadResponseHandler() {
+        DownloadManager.getInstance(this).download(url2, getDiskFileDir(this) + "/toefl.apk", new DownloadResponseHandler() {
             @Override
             public void onFinish(File download_file) {
 
@@ -121,12 +131,22 @@ public class DownLoadActivity extends AppCompatActivity {
             public void onFailure(String error_msg) {
 
             }
+
+            @Override
+            public void onPause(DownloadInfo info) {
+
+            }
+
+            @Override
+            public void onCancle(DownloadInfo info) {
+
+            }
         });
     }
 
     @OnClick(R.id.main_btn_down3)
     void onDown3() {
-        DownLoadManager.getInstance(this).download(url3, getDiskFileDir(this) + "/le.zip", new DownloadResponseHandler() {
+        DownloadManager.getInstance(this).download(url3, getDiskFileDir(this) + "/le.zip", new DownloadResponseHandler() {
             @Override
             public void onFinish(File download_file) {
 
@@ -143,22 +163,32 @@ public class DownLoadActivity extends AppCompatActivity {
             public void onFailure(String error_msg) {
 
             }
+
+            @Override
+            public void onPause(DownloadInfo info) {
+
+            }
+
+            @Override
+            public void onCancle(DownloadInfo info) {
+
+            }
         });
     }
 
     @OnClick(R.id.main_btn_cancel1)
     void onCancle1() {
-        DownLoadManager.getInstance(this).cancel(url1);
+        DownloadManager.getInstance(this).pause(url1);
     }
 
     @OnClick(R.id.main_btn_cancel2)
     void onCancle2() {
-        DownLoadManager.getInstance(this).cancel(url2);
+        DownloadManager.getInstance(this).pause(url2);
     }
 
     @OnClick(R.id.main_btn_cancel3)
     void onCancle3() {
-        DownLoadManager.getInstance(this).cancel(url3);
+        DownloadManager.getInstance(this).pause(url3);
     }
 
     @Override
@@ -166,7 +196,6 @@ public class DownLoadActivity extends AppCompatActivity {
         super.onDestroy();
         if (null != mUnbinder) mUnbinder.unbind();
     }
-
 
     /**
      * 获取缓存文件目录

@@ -38,4 +38,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     //eventbus
     compile 'org.greenrobot:eventbus:3.1.1'
+    //fastjson
+    compile 'com.alibaba:fastjson:1.2.34'
 }

@@ -1,12 +1,15 @@
 package com.yang.download.download;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yang on 2018/6/21.
  * 下载信息
  */
 
-public class DownloadInfo {
-    public static final long TOTAL_ERROR = -1;//获取进度失败
+public class DownloadInfo implements Serializable{
     private String url;//下载路径
     private String targetUrl;//存储路径
     private long total;//总大小

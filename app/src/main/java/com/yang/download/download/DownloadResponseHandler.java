@@ -8,7 +8,9 @@ import java.io.File;
  */
 public abstract class DownloadResponseHandler {
 
-    public abstract void onFinish(File download_file);
     public abstract void onProgress(long currentBytes, long totalBytes);
+    public abstract void onFinish(File download_file);
+    public abstract void onPause(DownloadInfo downloadInfo);
+    public abstract void onCancle(DownloadInfo downloadInfo);
     public abstract void onFailure(String error_msg);
 }

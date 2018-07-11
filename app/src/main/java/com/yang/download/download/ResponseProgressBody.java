@@ -1,8 +1,11 @@
 package com.yang.download.download;
 
+import android.content.Context;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -11,6 +14,7 @@ import okio.BufferedSource;
 import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
+
 
 /**
  * 重写responsebody 设置下载进度监听
@@ -23,12 +27,23 @@ public class ResponseProgressBody extends ResponseBody {
     private BufferedSource bufferedSource;
     private DownloadInfo info;
     private long progress;//开始前已下载进度
+    private Context mContext;
+    private Map<String, DownloadInfo> downloadInfos;
 
-    public ResponseProgressBody(ResponseBody responseBody, DownloadResponseHandler downloadResponseHandler, DownloadInfo info) {
+    public ResponseProgressBody(Context context, ResponseBody responseBody, DownloadResponseHandler downloadResponseHandler, DownloadInfo info) {
         this.mResponseBody = responseBody;
         this.mDownloadResponseHandler = downloadResponseHandler;
         this.info = info;
+        this.mContext = context;
         progress = info.getProgress();
+        downloadInfos = SpTool.getMap(mContext, DownloadManager.DOWNLOAD_MAPS);
+        if (info.getTotal() <= 0) {
+            info.setTotal(mResponseBody.contentLength());
+            if (downloadInfos != null) {
+                downloadInfos.put(info.getUrl(), info);
+                SpTool.putMap(mContext, DownloadManager.DOWNLOAD_MAPS, downloadInfos);
+            }
+        }
     }
 
     @Override
@@ -38,9 +53,6 @@ public class ResponseProgressBody extends ResponseBody {
 
     @Override
     public long contentLength() {
-        if(info.getTotal()<=0){
-            info.setTotal(mResponseBody.contentLength());
-        }
         return mResponseBody.contentLength();
     }
 
@@ -63,10 +75,15 @@ public class ResponseProgressBody extends ResponseBody {
                 long bytesRead = super.read(sink, byteCount);
                 totalBytesRead += ((bytesRead != -1) ? bytesRead : 0);
                 if (mDownloadResponseHandler != null) {
-                    info.setProgress(totalBytesRead+progress);
+                    info.setProgress(totalBytesRead + progress);
 //                    mDownloadResponseHandler.onProgress(totalBytesRead+(info!=null?info.getProgress():0), info!=null?info.getProgress()+mResponseBody.contentLength():mResponseBody.contentLength());
                     mDownloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
-                    info.setDownloadState(DownLoadManager.DOWNLOAD_STATE_DOWNLOADING);
+                    info.setDownloadState(DownloadManager.DOWNLOAD_STATE_DOWNLOADING);
+
+                    if (downloadInfos != null) {
+                        downloadInfos.put(info.getUrl(), info);
+                        SpTool.putMap(mContext, DownloadManager.DOWNLOAD_MAPS, downloadInfos);
+                    }
                     EventBus.getDefault().post(info);
                 }
                 return bytesRead;
