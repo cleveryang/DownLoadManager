@@ -47,9 +47,9 @@
 
 全局监听(eventbus实现，也可用广播等)
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(DownloadInfo info){
-        //返回info对象
+        //返回info对象(这是在子线程)
     }
     
 取消下载
