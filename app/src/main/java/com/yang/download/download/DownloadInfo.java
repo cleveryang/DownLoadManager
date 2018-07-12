@@ -1,8 +1,6 @@
 package com.yang.download.download;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yang on 2018/6/21.

@@ -1,6 +1,8 @@
 package com.yang.download.download;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -29,6 +31,7 @@ public class ResponseProgressBody extends ResponseBody {
     private long progress;//开始前已下载进度
     private Context mContext;
     private Map<String, DownloadInfo> downloadInfos;
+    private Handler handler;
 
     public ResponseProgressBody(Context context, ResponseBody responseBody, DownloadResponseHandler downloadResponseHandler, DownloadInfo info) {
         this.mResponseBody = responseBody;
@@ -44,6 +47,8 @@ public class ResponseProgressBody extends ResponseBody {
                 SpTool.putMap(mContext, DownloadManager.DOWNLOAD_MAPS, downloadInfos);
             }
         }
+
+        handler = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -77,7 +82,12 @@ public class ResponseProgressBody extends ResponseBody {
                 if (mDownloadResponseHandler != null) {
                     info.setProgress(totalBytesRead + progress);
 //                    mDownloadResponseHandler.onProgress(totalBytesRead+(info!=null?info.getProgress():0), info!=null?info.getProgress()+mResponseBody.contentLength():mResponseBody.contentLength());
-                    mDownloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDownloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
+                        }
+                    });
                     info.setDownloadState(DownloadManager.DOWNLOAD_STATE_DOWNLOADING);
 
                     if (downloadInfos != null) {

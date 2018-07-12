@@ -75,7 +75,7 @@ public class DownLoadActivity extends AppCompatActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(DownloadInfo info){
         txt.setText(txt.getText().toString()+"\n"+info.getUrl()+"---progress:"+info.getProgress()+"---total:"+info.getTotal());
     }

@@ -186,7 +186,7 @@ public class DownloadManager {
     }
 
     /**
-     * 开始下载
+     * 添加下载任务
      *
      * @param url       下载请求的网址
      * @param targetUrl 下载保存的位置
@@ -221,10 +221,11 @@ public class DownloadManager {
     }
 
     /**
-     * 开始下载
+     * 添加下载任务
      *
-     * @param url       下载请求的网址
-     * @param targetUrl 下载保存的位置
+     * @param url                     下载请求的网址
+     * @param targetUrl               下载保存的位置
+     * @param downloadResponseHandler 用来回调的接口
      */
     public void download(String url, String targetUrl, final DownloadResponseHandler downloadResponseHandler) {
         DownloadInfo downloadInfo = new DownloadInfo(url);
@@ -233,7 +234,7 @@ public class DownloadManager {
     }
 
     /**
-     * 开始下载
+     * 添加下载任务
      *
      * @param downloadInfo            下载类
      * @param downloadResponseHandler 用来回调的接口
@@ -255,22 +256,29 @@ public class DownloadManager {
         if (downloadInfos.get(downloadInfo.getUrl()) != null) {//在下载队列中
             info = downloadInfos.get(downloadInfo.getUrl());
             File file = new File(info.getTargetUrl());
+            boolean isNormal = true;
             if (file.exists()) {
                 //找到了文件,代表已经下载过,则获取其长度
                 info.setProgress(file.length());
                 if (info.getProgress() >= info.getTotal()) {
+                    isNormal = false;
                     file.delete();
-                    File newFile = new File(info.getTargetUrl());
-                    info.setProgress(newFile.length());
-                }
-                downloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
+                    info.setProgress(0);
+                    info.setTotal(0);
+                } else
+                    downloadResponseHandler.onProgress(info.getProgress(), info.getTotal());
             }
             info.setDownloadState(DOWNLOAD_STATE_WAITING);
             downloadInfos.put(info.getUrl(), info);
             SpTool.putMap(mContext, DOWNLOAD_MAPS, downloadInfos);
             EventBus.getDefault().post(info);
-            request = new Request.Builder()
-                    .addHeader("RANGE", "bytes=" + info.getProgress() + "-" + info.getTotal())
+            if (isNormal)
+                request = new Request.Builder()
+                        .addHeader("RANGE", "bytes=" + info.getProgress() + "-" + info.getTotal())
+                        .url(info.getUrl())
+                        .tag(info.getUrl())
+                        .build();
+            else request = new Request.Builder()
                     .url(info.getUrl())
                     .tag(info.getUrl())
                     .build();
