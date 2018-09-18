@@ -235,6 +235,38 @@ public class DownloadManager {
 
     /**
      * 添加下载任务
+     */
+    public void download(DownloadInfo downloadInfo) {
+        download(downloadInfo, new DownloadResponseHandler() {
+            @Override
+            public void onProgress(long currentBytes, long totalBytes) {
+
+            }
+
+            @Override
+            public void onFinish(File download_file) {
+
+            }
+
+            @Override
+            public void onPause(DownloadInfo downloadInfo) {
+
+            }
+
+            @Override
+            public void onCancle(DownloadInfo downloadInfo) {
+
+            }
+
+            @Override
+            public void onFailure(String error_msg) {
+
+            }
+        });
+    }
+
+    /**
+     * 添加下载任务
      *
      * @param downloadInfo            下载类
      * @param downloadResponseHandler 用来回调的接口
